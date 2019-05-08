@@ -11,7 +11,7 @@ const ProfileSchema = new mongoose.Schema({
   status: {
     type: String
   },
-  story: {
+  bio: {
     type: String
   },
   social: {
