@@ -28,6 +28,29 @@ const ProfileSchema = new mongoose.Schema({
       type: String
     }
   },
+  victim: [
+    {
+      name: {
+        type: String
+      },
+      title: {
+        type: String
+      },
+      story: {
+        type: String
+      }
+    }
+  ],
+  venting: [
+    {
+      about: {
+        type: String
+      },
+      vent: {
+        type: String
+      }
+    }
+  ],
   date: {
     type: Date,
     default: Date.now

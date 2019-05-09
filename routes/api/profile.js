@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const config = require('config');
+const request = require('request');
 const auth = require('../../middleware/auth');
 const { check, validationResult } = require('express-validator/check');
 
@@ -112,7 +114,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET profile by user ID
+// GET request to api/profile by user ID
 router.get('/user/:user_id', async (req, res) => {
   try {
     const profile = await Profile.findOne({
@@ -132,7 +134,7 @@ router.get('/user/:user_id', async (req, res) => {
   }
 });
 
-// Delete request that will delete profile, user and vents
+// Delete request to api/profile that will delete profile, user and vents
 router.delete('/', auth, async (req, res) => {
   try {
     // remove vents
@@ -144,6 +146,137 @@ router.delete('/', auth, async (req, res) => {
     await User.findOneAndRemove({ _id: req.user.id });
 
     res.json({ msg: 'User Deleted' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// PUT request to api/profile/victim to add victim blog in profile page
+router.put(
+  '/victim',
+  [
+    auth,
+    [
+      check('name', 'name is required')
+        .not()
+        .isEmpty(),
+      check('story', 'Story is required')
+        .not()
+        .isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, title, story } = req.body;
+
+    const newVictim = {
+      name,
+      title,
+      story
+    };
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+
+      // victim array with unshift which prepends most recent post to top
+      profile.victim.unshift(newVictim);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
+
+// DELETE api/profile/victim/:victim_id - Delete victim story from profile
+router.delete('/victim/:victim_id', auth, async (req, res) => {
+  try {
+    //  retrive profile of logged in user
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    //  Get the right victim to remove index and match the index by id
+    const removeIndex = profile.victim
+      .map(item => item.id)
+      .indexOf(req.params.victim_id);
+
+    profile.victim.splice(removeIndex, 1);
+
+    await profile.save();
+
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// PUT request to api/profile/venting to add victim blog in profile page
+router.put(
+  '/venting',
+  [
+    auth,
+    [
+      check('about', 'About is required')
+        .not()
+        .isEmpty(),
+      check('vent', 'Your vent is required')
+        .not()
+        .isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { about, vent } = req.body;
+
+    const newVent = {
+      about,
+      vent
+    };
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+
+      // victim array with unshift which prepends most recent post to top
+      profile.venting.unshift(newVent);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
+
+// DELETE api/profile/venting/:venting_id - Delete vent story from profile
+router.delete('/venting/:venting_id', auth, async (req, res) => {
+  try {
+    //  retrive profile of logged in user
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    //  Get the right victim to remove index and match the index by id
+    const removeIndex = profile.venting
+      .map(item => item.id)
+      .indexOf(req.params.venting);
+
+    profile.venting.splice(removeIndex, 1);
+
+    await profile.save();
+
+    res.json(profile);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
