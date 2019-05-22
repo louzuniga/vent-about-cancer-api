@@ -1,7 +1,4 @@
 language: node_js
-node_js: node
-cache:
-  directories:
-    - node_modules
-env:
-  - CI=true
+ node_js: node
+ services:
+     - mongodb

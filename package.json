@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "server": "nodemon server"
+    "test": "mocha --exit",
+    "server": "nodemon server",
+    "client": "npm start ../vent-about-cancer-react",
+    "dev": "concurently \"npm run server\" \"npm run client\""
   },
   "author": "Lou-Zuniga",
   "license": "MIT",
