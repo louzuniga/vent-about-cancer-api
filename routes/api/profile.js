@@ -19,7 +19,7 @@ router.get('/mine', auth, async (req, res) => {
       return res.status(400).json({ msg: 'No profile' });
     }
 
-    res, json(profile);
+    res.json(profile);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
