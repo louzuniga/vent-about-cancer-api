@@ -161,7 +161,7 @@ router.put(
       check('name', 'name is required')
         .not()
         .isEmpty(),
-      check('story', 'Story is required')
+      check('story', 'Please write a short tribute')
         .not()
         .isEmpty()
     ]
@@ -220,7 +220,7 @@ router.delete('/victim/:victim_id', auth, async (req, res) => {
 
 // PUT request to api/profile/venting to add victim blog in profile page
 router.put(
-  '/venting',
+  '/vent',
   [
     auth,
     [
