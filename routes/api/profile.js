@@ -7,6 +7,7 @@ const { check, validationResult } = require('express-validator/check');
 
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
+const Vents = require('../../models/Vents');
 
 // GET api/profile/mine. Will get curret users profile
 router.get('/mine', auth, async (req, res) => {
@@ -138,6 +139,7 @@ router.get('/user/:user_id', async (req, res) => {
 router.delete('/', auth, async (req, res) => {
   try {
     // remove vents
+    await Post.deleteMany({ user: req.user.id });
 
     // remove profile
     await Profile.findOneAndRemove({ user: req.user.id });
@@ -161,6 +163,12 @@ router.put(
       check('name', 'name is required')
         .not()
         .isEmpty(),
+      check('dates', 'Please write a short tribute')
+        .not()
+        .isEmpty(),
+      check('relationship', 'name is required')
+        .not()
+        .isEmpty(),
       check('story', 'Please write a short tribute')
         .not()
         .isEmpty()
@@ -172,11 +180,12 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, title, story } = req.body;
+    const { name, dates, relationship, story } = req.body;
 
     const newVictim = {
       name,
-      title,
+      dates,
+      relationship,
       story
     };
 
@@ -218,13 +227,13 @@ router.delete('/victim/:victim_id', auth, async (req, res) => {
   }
 });
 
-// PUT request to api/profile/venting to add victim blog in profile page
+// PUT request to api/profile/vent to add victim blog in profile page
 router.put(
   '/vent',
   [
     auth,
     [
-      check('about', 'About is required')
+      check('title', 'Title is required')
         .not()
         .isEmpty(),
       check('vent', 'Your vent is required')
@@ -238,10 +247,11 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { about, vent } = req.body;
+    const { title, date, vent } = req.body;
 
     const newVent = {
-      about,
+      title,
+      date,
       vent
     };
 
@@ -249,7 +259,7 @@ router.put(
       const profile = await Profile.findOne({ user: req.user.id });
 
       // victim array with unshift which prepends most recent post to top
-      profile.venting.unshift(newVent);
+      profile.vent.unshift(newVent);
 
       await profile.save();
 
@@ -261,18 +271,18 @@ router.put(
   }
 );
 
-// DELETE api/profile/venting/:venting_id - Delete vent story from profile
-router.delete('/venting/:venting_id', auth, async (req, res) => {
+// DELETE api/profile/vent/:vent_id - Delete vent story from profile
+router.delete('/vent/:vent_id', auth, async (req, res) => {
   try {
     //  retrive profile of logged in user
     const profile = await Profile.findOne({ user: req.user.id });
 
     //  Get the right victim to remove index and match the index by id
-    const removeIndex = profile.venting
+    const removeIndex = profile.vent
       .map(item => item.id)
-      .indexOf(req.params.venting);
+      .indexOf(req.params.vent);
 
-    profile.venting.splice(removeIndex, 1);
+    profile.vent.splice(removeIndex, 1);
 
     await profile.save();
 

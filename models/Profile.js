@@ -33,7 +33,10 @@ const ProfileSchema = new mongoose.Schema({
       name: {
         type: String
       },
-      title: {
+      dates: {
+        type: String
+      },
+      relationship: {
         type: String
       },
       story: {
@@ -41,9 +44,12 @@ const ProfileSchema = new mongoose.Schema({
       }
     }
   ],
-  venting: [
+  vent: [
     {
-      about: {
+      title: {
+        type: String
+      },
+      date: {
         type: String
       },
       vent: {
