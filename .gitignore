@@ -1,8 +1,3 @@
 node_modules/
-config/env.json
-config/default.json
-.DS_Store
-.env
-*.orig
-.idea/
-.vscode/
+package-lock.json
+/config/keys_dev.js

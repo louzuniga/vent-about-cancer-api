@@ -1,4 +1,0 @@
-{
-  "mongoURI": "mongodb://demo:demo1234@ds147446.mlab.com:47446/vent-about-cancer",
-  "jwtSecret": "thisIsASecret"
-}
