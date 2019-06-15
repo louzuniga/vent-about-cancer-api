@@ -1,6 +1,6 @@
 const express = require('express');
 const connectDB = require('./config/db');
-const CLIENT_ORIGIN = require('./config/db');
+const API_ORIGIN = require('./config/db');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -31,6 +31,6 @@ app.use('/api/vents', require('./routes/api/vents'));
 //     });
 // }
 
-const PORT = process.env.CLIENT_ORIGIN || 5000;
+const PORT = process.env.API_ORIGIN || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

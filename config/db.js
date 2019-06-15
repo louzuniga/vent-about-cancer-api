@@ -20,7 +20,6 @@ const connectDB = async () => {
   }
 };
 
-module.exports.CLIENT_ORIGIN =
-  process.env.CLIENT_ORIGIN || 'http://localhost:5000';
+module.exports.API_ORIGIN = process.env.API_ORIGIN || 'http://localhost:5000';
 
 module.exports = connectDB;
