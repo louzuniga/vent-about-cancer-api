@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const VentsSchema = new mongoose.Schema({
+const PostsSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users'
@@ -41,4 +41,4 @@ const VentsSchema = new mongoose.Schema({
   ]
 });
 
-module.exports = Vents = mongoose.model('post', VentsSchema);
+module.exports = Posts = mongoose.model('post', PostsSchema);

@@ -3,11 +3,11 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator/check');
 const auth = require('../../middleware/auth');
 
-const Vents = require('../../models/Vents');
+const Posts = require('../../models/Posts');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 
-// POST api/vents - create a new vent posts
+// POST api/posts - create a new post
 router.post(
   '/',
   [
@@ -28,15 +28,15 @@ router.post(
       // retrive user and name from the DB
       const user = await User.findById(req.user.id).select('-password');
 
-      const newVent = new Vents({
+      const newPost = new Posts({
         text: req.body.text,
         name: user.name,
         user: req.user.id
       });
 
-      const vent = await newVent.save();
+      const post = await newPost.save();
 
-      res.json(vent);
+      res.json(post);
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server Error');
@@ -44,121 +44,121 @@ router.post(
   }
 );
 
-// GET api/vents - get all vents by all users registered
+// GET api/posts - get all posts by all users registered
 router.get('/', auth, async (req, res) => {
   try {
-    // finds and sorts vents from most recent
-    const vents = await Vents.find().sort({ date: -1 });
+    // finds and sorts posts from most recent
+    const posts = await Posts.find().sort({ date: -1 });
 
-    res.json(vents);
+    res.json(Posts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Sever Error');
   }
 });
 
-// GET api/vetns/:id - get vents by id
+// GET api/vetns/:id - get posts by id
 router.get('/:id', auth, async (req, res) => {
   try {
     // req.param.id allows to get it from url
-    const vent = await Vents.findById(req.params.id);
+    const post = await Posts.findById(req.params.id);
 
-    if (!vent) {
-      return res.status(404).json({ msg: 'Vent is not found' });
+    if (!post) {
+      return res.status(404).json({ msg: 'Post is not found' });
     }
 
-    res.json(vent);
+    res.json(post);
   } catch (err) {
     console.error(err.message);
 
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Vent is not found' });
+      return res.status(404).json({ msg: 'Post is not found' });
     }
 
     res.status(500).send('Server Error');
   }
 });
 
-// DELETE api/vents/:id - Delete a vent by id
+// DELETE api/posts/:id - Delete a post by id
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const vent = await Vents.findById(req.params.id);
+    const post = await Posts.findById(req.params.id);
 
-    if (!vent) {
-      return res.status(404).json({ msg: 'Vent is not found' });
+    if (!post) {
+      return res.status(404).json({ msg: 'Post is not found' });
     }
 
-    // make sure that the user can only his own vent
-    if (vent.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'Not Authorized to delete vent' });
+    // make sure that the user can only his own post
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Not Authorized to delete post' });
     }
-    await vent.remove();
+    await post.remove();
 
-    res.json(vent);
+    res.json(post);
   } catch (err) {
     console.error(err.message);
 
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Vent is not found' });
+      return res.status(404).json({ msg: 'Post is not found' });
     }
 
     res.status(500).send('Server Error');
   }
 });
 
-// PUT api/vents/love/:id - love a vent
+// PUT api/posts/love/:id - love a post
 router.put('/love/:id', auth, async (req, res) => {
   try {
-    const vent = await Vents.findById(req.params.id);
+    const post = await Posts.findById(req.params.id);
 
     // Verify if already clicked love
     if (
-      vent.love.filter(love => love.user.toString() === req.user.id).length > 0
+      post.love.filter(love => love.user.toString() === req.user.id).length > 0
     ) {
       return res.status(400).json({ msg: 'Already showed some love' });
     }
 
-    vent.love.unshift({ user: req.user.id });
+    post.love.unshift({ user: req.user.id });
 
-    await vent.save();
+    await post.save();
 
-    res.json(vent.love);
+    res.json(post.love);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
 
-// PUT api/vents/unlove/:id - undo the love
+// PUT api/posts/unlove/:id - undo the love
 router.put('/unlove/:id', auth, async (req, res) => {
   try {
-    const vent = await Vents.findById(req.params.id);
+    const post = await Posts.findById(req.params.id);
 
     // Verify if already clicked love
     if (
-      vent.love.filter(love => love.user.toString() === req.user.id).length ===
+      post.love.filter(love => love.user.toString() === req.user.id).length ===
       0
     ) {
       return res.status(400).json({ msg: 'No love yet' });
     }
 
     // Find the correct love to be removed
-    const removeIndex = vent.love
+    const removeIndex = post.love
       .map(love => love.user.toString())
       .indexOf(req.user.id);
 
-    vent.love.splice(removeIndex, 1);
+    post.love.splice(removeIndex, 1);
 
-    await vent.save();
+    await post.save();
 
-    res.json(vent.love);
+    res.json(post.love);
   } catch (err) {
     console.log(err.message);
     res.status(500).send('Server Error');
   }
 });
 
-// POST api/vents/comment/:id - comment on a vent
+// POST api/posts/comment/:id - comment on a post
 router.post(
   '/comment/:id',
   [
@@ -177,7 +177,7 @@ router.post(
 
     try {
       const user = await User.findById(req.user.id).select('-password');
-      const vent = await Vents.findById(req.params.id);
+      const post = await Posts.findById(req.params.id);
 
       const newComment = {
         text: req.body.text,
@@ -185,11 +185,11 @@ router.post(
         user: req.user.id
       };
 
-      vent.comments.unshift(newComment);
+      post.comments.unshift(newComment);
 
-      await vent.save();
+      await post.save();
 
-      res.json(vent.comments);
+      res.json(post.comments);
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server Error');
@@ -197,13 +197,13 @@ router.post(
   }
 );
 
-// Delete api/vents/comment/:id/:comment_id
+// Delete api/posts/comment/:id/:comment_id
 router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
   try {
-    const vent = await Vents.findById(req.params.id);
+    const post = await Posts.findById(req.params.id);
 
     // extract comment
-    const comment = vent.comments.find(
+    const comment = post.comments.find(
       comment => comment.id === req.params.comment_id
     );
 
@@ -218,15 +218,15 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
     }
 
     // Get remove index
-    const removeIndex = vent.comments
+    const removeIndex = post.comments
       .map(comment => comment.user.toString())
       .indexOf(req.user.id);
 
-    vent.comments.splice(removeIndex, 1);
+    post.comments.splice(removeIndex, 1);
 
-    await vent.save();
+    await post.save();
 
-    res.json(vent.comments);
+    res.json(post.comments);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

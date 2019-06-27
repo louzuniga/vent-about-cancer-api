@@ -44,7 +44,7 @@ const ProfileSchema = new mongoose.Schema({
       }
     }
   ],
-  vent: [
+  post: [
     {
       title: {
         type: String
@@ -52,7 +52,7 @@ const ProfileSchema = new mongoose.Schema({
       date: {
         type: String
       },
-      vent: {
+      post: {
         type: String
       }
     }

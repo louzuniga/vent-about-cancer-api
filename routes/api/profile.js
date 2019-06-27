@@ -7,7 +7,7 @@ const { check, validationResult } = require('express-validator/check');
 
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
-const Vents = require('../../models/Vents');
+const Posts = require('../../models/Posts');
 
 // GET api/profile/mine. Will get curret users profile
 router.get('/mine', auth, async (req, res) => {
@@ -138,8 +138,8 @@ router.get('/user/:user_id', async (req, res) => {
 // Delete request to api/profile that will delete profile, user and vents
 router.delete('/', auth, async (req, res) => {
   try {
-    // remove vents
-    await Vents.deleteMany({ user: req.user.id });
+    // remove vents/posts
+    await Posts.deleteMany({ user: req.user.id });
 
     // remove profile
     await Profile.findOneAndRemove({ user: req.user.id });
