@@ -50,7 +50,7 @@ router.get('/', auth, async (req, res) => {
     // finds and sorts posts from most recent
     const posts = await Posts.find().sort({ date: -1 });
 
-    res.json(Posts);
+    res.json(posts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Sever Error');
