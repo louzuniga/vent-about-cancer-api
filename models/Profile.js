@@ -57,6 +57,19 @@ const ProfileSchema = new mongoose.Schema({
       }
     }
   ],
+  vent: [
+    {
+      title: {
+        type: String
+      },
+      date: {
+        type: String
+      },
+      vent: {
+        type: String
+      }
+    }
+  ],
   date: {
     type: Date,
     default: Date.now
